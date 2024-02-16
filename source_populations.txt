@@ -1,0 +1,11 @@
+Russia_Andronovo.SG
+Russia_Srubnaya_Alakul
+
+Indus_lowAASI
+Indus_medAASI
+Indus_hiAASI
+
+Uzbekistan_Bustan_BA
+Turkmenistan_Gonur_BA_1
+Uzbekistan_Dzharkutan_BA_1
+Uzbekistan_SappaliTepe_BA
