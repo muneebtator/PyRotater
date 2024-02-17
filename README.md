@@ -10,7 +10,7 @@ Before starting, make sure you have AdmixTools, python3 and pandas python packag
 ### Running script
 Put your source/left pop model sets/groups in the `source_populations.txt` file. Each source set/group is separated by a new line, you can check the example `source_populations.txt`.
 
-Create a directory called `outputs` in your workspace, this is where the model outputs will be saved. Make sure the `popleft` in  your qpAdm parameter file is called left.txt, this file will be automatically generated for each model by PyRotator.
+Create a directory called `outputs` in your workspace, this is where the model outputs will be saved. Make sure the `popleft` in  your qpAdm parameter file is called `left.txt`, this file will be automatically generated for each model by PyRotator.
 
 Your qpAdm parameter file needs to be called `parqpadm`.
 
