@@ -49,7 +49,7 @@ for filename in os.listdir(directory):
                     parsing_summ = True
                     # Split the line and extract the p-value and additional values
                     parts = line.split()
-                    p_value = float(parts[3]) * 100  # Convert p-value to percentage
+                    p_value = parts[3]
                     # Convert additional values to percentages
                     num_extra_values = len(left_pops) - 1
                     extra_values = [float(value) * 100 for value in parts[4:4+num_extra_values]]
@@ -84,7 +84,7 @@ for filename in os.listdir(directory):
                 for i in range(1, num_sources + 1):
                     header_row.append(f"Source {i}")
                 for i in range(1, num_sources2 + 1):
-                    header_row.append(f"Percent {i}")
+                    header_row.append(f"Weight {i}")
                 for i in range(1, num_std_errors + 1):
                     header_row.append(f"Std Error {i}")
                 for i in range(1, num_best_coefficients + 1):
