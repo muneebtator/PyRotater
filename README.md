@@ -8,9 +8,9 @@ Before starting, make sure you have AdmixTools, python3 and pandas python packag
     unzip main.zip
 
 ### Running script
-Put your reference/left pop model sets in the `source_populations.txt` file. Each source set is separated by a new line, you can check the example `source_populations.txt`.
+Put your source/left pop model sets/groups in the `source_populations.txt` file. Each source set/group is separated by a new line, you can check the example `source_populations.txt`.
 
-Create a directory called `outputs` in your workspace, this is where the model outputs will be saved. Make sure the `popleft` in  your qpAdm parameter file is called left.txt, this file will be automatically generated for each model by PyRotator.
+Create a directory called `outputs` in your workspace, this is where the model outputs will be saved. Make sure the `popleft` in  your qpAdm parameter file is called `left.txt`, this file will be automatically generated for each model by PyRotator.
 
 Your qpAdm parameter file needs to be called `parqpadm`.
 
@@ -20,3 +20,9 @@ PyRotator takes the name of the sample you want to generate rotated models for a
 Once the rotation is complete and all the models are generated, you can run `outputparser.py` to generate a spreadsheet of all your rotated models.
 
     python3 outputParser.py
+### Features to be added.
+ - Create different directories for different rotation runs and automatically parse model files to generate spreadsheet once rotation is done.
+ - Automatically create output directory if not created.
+ - Have the parser sort the spreadsheet based on p-value and provide a 'passed' column.
+ - Switch to job scheduler instead of directly running the qpAdm command.
+ - Further work on model generations to generate more models for runs (e.g. option to drop source populations sets/groups).
