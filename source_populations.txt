@@ -9,3 +9,5 @@ Uzbekistan_Bustan_BA
 Turkmenistan_Gonur_BA_1
 Uzbekistan_Dzharkutan_BA_1
 Uzbekistan_SappaliTepe_BA
+
+Runs_Without_Set = 2, 3
