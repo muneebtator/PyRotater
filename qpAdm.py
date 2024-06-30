@@ -1,25 +1,36 @@
 import os
-import sys
-from concurrent.futures import ThreadPoolExecutor
 import random
 from datetime import datetime
 from itertools import product
+from concurrent.futures import ThreadPoolExecutor
 
+# We use the timestamp as the ID for this run and set up the folders
 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 os.makedirs(os.path.join("outputs", timestamp, "temp"), exist_ok=True)
 os.makedirs(os.path.join("outputs", timestamp, "runs"), exist_ok=True)
 
 def divide_models(array):
 
+    # This calculates how many items should go into each part by dividing the total number of items by the number of CPU cores.
     k = len(array) // os.cpu_count()
+
+    # This finds out how many items are left over after dividing evenly
     m = len(array) % os.cpu_count()
 
+    # This sets up an empty list called result to hold the divided parts. It also starts counting from zero to know where to start dividing.
     result = []
     start = 0
 
+    # This loop runs once for each CPU core your computer has. It makes sure each core gets its share.
     for i in range(os.cpu_count()):
+
+        # This decides where to stop slicing the list for the current part. It adds 1 extra if there are leftover items to share.
         end = start + k + (1 if i < m else 0)
+
+        # This cuts out a piece of the list from start to end and adds it to the result list.
         result.append(array[start:end])
+
+        # This moves the start to the next position for the next slice.
         start = end
 
     return result
@@ -108,7 +119,7 @@ def config(model):
             else:
                 outfile.write(line)
     
-        outfile.write(f"popleft: outputs/{timestamp}/temp/model_{random_number}.txt\n")
+        outfile.write(f"\npopleft: outputs/{timestamp}/temp/model_{random_number}.txt\n")
         outfile.write(f"indivname: set/{set_name}.ind\n")
         outfile.write(f"snpname: set/{set_name}.snp\n")
         outfile.write(f"genotypename: set/{set_name}.geno\n")
@@ -134,13 +145,13 @@ def initiate_model(divided_models):
                 for model in models:
                     
                     id = config(model)
-                    os.system(f"qpAdm -p outputs/{timestamp}/temp/parqpadm_{id} > outputs/{timestamp}/runs/{id}")
+                    os.system(f"qpAdm -p outputs/{timestamp}/temp/parqpadm_{id} > outputs/{timestamp}/runs/{id}.txt")
                     print(f"Model {id} done")
 
             else:
                 
                 id = config(models)
-                os.system(f"qpAdm -p outputs/{timestamp}/temp/parqpadm_{id} > outputs/{timestamp}/runs/{id}")
+                os.system(f"qpAdm -p outputs/{timestamp}/temp/parqpadm_{id} > outputs/{timestamp}/runs/{id}.txt")
                 print(f"Model {id} done")
     
 
@@ -157,5 +168,7 @@ def main():
     with ThreadPoolExecutor(max_workers=os.cpu_count()) as executor:
         executor.map(initiate_model, divided_models)
 
+    os.system(f"python3 outputParser.py {timestamp}")
+    
 if __name__ == "__main__":
     main()
