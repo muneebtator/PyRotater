@@ -1,6 +1,29 @@
 import os
 import sys
+from concurrent.futures import ThreadPoolExecutor
+import random
+from datetime import datetime
 from itertools import product
+
+timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+os.makedirs(os.path.join("outputs", timestamp, "temp"), exist_ok=True)
+os.makedirs(os.path.join("outputs", timestamp, "runs"), exist_ok=True)
+
+def divide_models(array):
+
+    k = len(array) // os.cpu_count()
+    m = len(array) % os.cpu_count()
+
+    result = []
+    start = 0
+
+    for i in range(os.cpu_count()):
+        end = start + k + (1 if i < m else 0)
+        result.append(array[start:end])
+        start = end
+
+    return result
+
 
 def read_sets_from_file(file_path):
     sets = []
@@ -67,41 +90,72 @@ def generate_models(sets, runs_without_set=None):
 
     return all_combinations
 
+def config(model):
 
-def write_model_to_file(model, parameter):
-    with open("left.txt", 'w') as file:
-        # Write the parameter as the first line
-        file.write(parameter + "\n")
-        # Write the model to the left.txt file
-        for item in model:
-            file.write("%s\n" % item)
-            
-def run_command_for_model(output_file):
-    # Run the command for the current model
-    command = f"qpAdm -p parqpadm > outputs/{output_file}"
-    os.system(command)
+    set_name = ""
+    indv_target = ""
+    random_number = random.randint(1000, 9999)
+    leftpops = os.path.join("outputs", timestamp, "temp", f"model_{random_number}.txt")
+    
+    with open(os.path.join("outputs", timestamp, "temp", f"parqpadm_{random_number}"), 'w') as outfile, open("parqpadm", 'r') as infile:
+        for line in infile:
+            if line.startswith('#'):
+                if 'Set_Name' in line:
+                    set_name = line.split('=')[1].strip()
 
-def main(parameter):
-    # File path containing sets of source populations
-    file_path = "source_populations.txt"
+                if 'Target' in line:
+                    indv_target = line.split('=')[1].strip()
+            else:
+                outfile.write(line)
+    
+        outfile.write(f"popleft: outputs/{timestamp}/temp/model_{random_number}.txt\n")
+        outfile.write(f"indivname: set/{set_name}.ind\n")
+        outfile.write(f"snpname: set/{set_name}.snp\n")
+        outfile.write(f"genotypename: set/{set_name}.geno\n")
+
+    with open(leftpops, "w") as file:
+        file.write(indv_target + "\n")
+        if isinstance(model, (list, tuple)):
+            for item in model:
+                file.write(str(item) + '\n')
+        else:
+            file.write(str(model) + '\n')
+
+    return random_number
+
+def initiate_model(divided_models):
+
+    for models in divided_models:
+
+        if models:
+
+            if isinstance(models, list) and any(isinstance(model, list) for model in models):
+
+                for model in models:
+                    
+                    id = config(model)
+                    os.system(f"qpAdm -p outputs/{timestamp}/temp/parqpadm_{id} > outputs/{timestamp}/runs/{id}")
+                    print(f"Model {id} done")
+
+            else:
+                
+                id = config(models)
+                os.system(f"qpAdm -p outputs/{timestamp}/temp/parqpadm_{id} > outputs/{timestamp}/runs/{id}")
+                print(f"Model {id} done")
+    
+
+def main():
     
     # Read sets of source populations from the file
-    sets, runs_without_set = read_sets_from_file(file_path)
+    sets, runs_without_set = read_sets_from_file("source_populations.txt")
     
     # Generate all possible combinations of source populations
     all_models = generate_models(sets, runs_without_set)
     
-    # Run the command for each model
-    for idx, model_set in enumerate(all_models, start=1):
-        write_model_to_file(model_set, parameter)
-        output_file = f"model_{idx}.txt"
-        run_command_for_model(output_file)
-        print(f"Model {idx} done: {model_set}")
+    divided_models = divide_models(all_models)
 
+    with ThreadPoolExecutor(max_workers=os.cpu_count()) as executor:
+        executor.map(initiate_model, divided_models)
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        sys.exit(1)
-    parameter = sys.argv[1]
-    main(parameter)
-
+    main()
