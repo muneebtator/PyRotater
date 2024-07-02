@@ -10,9 +10,7 @@ Before starting, make sure you have AdmixTools, python3 and pandas python packag
 ### Running models
 Put your source/left pop model sets/groups in the `source_populations.txt` file. Each source set/group is separated by a new line, you can check the example `source_populations.txt`.
 
-Make sure the `popleft` in  your qpAdm parameter file is called `left.txt`, this file will be automatically generated for each model by qpAdm.py.
-
-Your qpAdm parameter file needs to be called `parqpadm` and it needs to be in the following format
+Your qpAdm parameter file needs to be called `parqpadm` and it doesn't need to include the popleft, indivname, snpname and genotypename parameters.
 
     # Set_Name = rotation
     # Target = Dad
